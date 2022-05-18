@@ -1,14 +1,12 @@
-from functools import wraps
-
 def greeter(func):
-    def aloha():
-        name = func()
+    def aloha(*args, **kwargs):
+        name = func(*args, **kwargs)
         welcome_text = f"Aloha {name.title()}"
         return welcome_text
     return aloha
 
 def sums_of_str_elements_are_equal(func):
-    def numbers_sum():
+    def numbers_sum(*args, **kwargs):
         def digits_sum(number):
             if number[0] == "-":
                 negative = True
@@ -20,7 +18,7 @@ def sums_of_str_elements_are_equal(func):
 
             return -1 * calculated_sum if negative else calculated_sum
 
-        numbers = func().split()
+        numbers = func(*args, **kwargs).split()
 
         first_sum = digits_sum(numbers[0])
         second_sum = digits_sum(numbers[1])
@@ -40,24 +38,28 @@ def format_output(*required_keys):
 
             for key in required_keys:
                 new_keys = key.split("__")
+                result_list = []
 
                 for x in new_keys:
                     if x not in dictionary_to_convert.keys():
                         raise ValueError
-                    dictionary_value = dictionary_to_convert[x]
-                    dictionary_keys[x] = dictionary_value if len(dictionary_value)>0 else "Empty value"
 
-            return dictionary_to_convert
+                    dictionary_value = dictionary_to_convert[x]
+                    result_list.append(dictionary_value if len(dictionary_value)>0 else "Empty value")
+
+                dictionary_keys[key] = " ".join(result_list)
+
+            return dictionary_keys
         return wrapper
     return make_dict
 
 
 def add_method_to_instance(klass):
-    def outer_wrapper(callable):
-        def wrapper():
-            return callable()
+    def outer_wrapper(func):
+        def wrapper(*args, **kwargs):
+            return func()
 
-        setattr(klass, callable.__name__, wrapper)
+        setattr(klass, func.__name__, wrapper)
 
         return wrapper
     return outer_wrapper
